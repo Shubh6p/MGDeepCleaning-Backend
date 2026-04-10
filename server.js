@@ -22,9 +22,14 @@ const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
+    // 1. Allow mobile apps/curl (no origin)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins[0] === true) {
+    
+    // 2. Allow local development automatically
+    const isLocal = origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1');
+    
+    // 3. Allow explicitly listed production origins
+    if (isLocal || allowedOrigins.indexOf(origin) !== -1 || allowedOrigins[0] === true) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -79,5 +84,8 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+module.exports = app;
