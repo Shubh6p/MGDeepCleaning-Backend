@@ -21,7 +21,14 @@ const verifyAdmin = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (err) {
-        return res.status(401).json({ error: "Unauthorized: Invalid or expired token." });
+        console.error("🛡️ Backend Auth: Token verification failed.", {
+            error: err.message,
+            tokenPreview: token.substring(0, 10) + "..."
+        });
+        return res.status(401).json({ 
+            error: "Unauthorized: Invalid or expired token.",
+            reason: err.message
+        });
     }
 };
 
